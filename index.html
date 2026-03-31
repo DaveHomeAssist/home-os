@@ -816,6 +816,156 @@
     }
   }
 
+  /* ── Anticipatory UX ──────────────────────────────── */
+
+  .greeting-bar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin:0 0 20px;
+    padding:16px 20px;
+    border-radius:22px;
+    border:1px solid rgba(112,82,52,0.12);
+    background:rgba(250,244,234,0.88);
+    box-shadow:0 6px 16px rgba(58,34,13,0.06);
+  }
+
+  .greeting-text{
+    margin:0;
+    font-size:1.05rem;
+    color:var(--ink-soft);
+  }
+
+  .greeting-text strong{
+    color:var(--ink);
+  }
+
+  .greeting-suggest{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.7);
+    color:var(--accent);
+    font-size:.88rem;
+    font-weight:600;
+    text-decoration:none;
+    transition:transform var(--speed), background var(--speed), border-color var(--speed);
+  }
+
+  .greeting-suggest:hover{
+    transform:translateY(-1px);
+    border-color:var(--accent);
+    background:rgba(156,93,50,0.06);
+  }
+
+  .greeting-suggest:active{
+    transform:scale(0.96);
+  }
+
+  .greeting-suggest::after{
+    content:"\2192";
+  }
+
+  .recent-row{
+    margin:0 0 20px;
+  }
+
+  .recent-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0 0 10px;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.74rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+  }
+
+  .recent-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .recent-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.7);
+    color:var(--ink);
+    font-size:.88rem;
+    font-weight:500;
+    text-decoration:none;
+    transition:transform var(--speed), background var(--speed), border-color var(--speed);
+  }
+
+  .recent-chip:hover{
+    transform:translateY(-1px);
+    border-color:rgba(112,82,52,0.3);
+    background:rgba(255,255,255,0.9);
+  }
+
+  .recent-chip:active{
+    transform:scale(0.96);
+  }
+
+  .recent-chip .rc-kind{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.66rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--muted);
+  }
+
+  .recent-chip .rc-freq{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:20px;
+    height:20px;
+    padding:0 5px;
+    border-radius:10px;
+    background:rgba(102,121,81,0.12);
+    color:var(--moss);
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.66rem;
+    font-weight:600;
+  }
+
+  .search-recents{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+  }
+
+  .search-recent-chip{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid rgba(112,82,52,0.1);
+    background:rgba(255,255,255,0.5);
+    color:var(--muted);
+    font-size:.78rem;
+    cursor:pointer;
+    transition:background var(--speed), color var(--speed);
+  }
+
+  .search-recent-chip:hover{
+    background:rgba(255,255,255,0.8);
+    color:var(--ink);
+  }
+
   /* ── Microinteraction feedback ─────────────────────── */
 
   /* Button press: scale down + color shift on :active */
@@ -1047,11 +1197,22 @@
       </aside>
     </header>
 
+    <div class="greeting-bar" id="greetingBar" hidden>
+      <p class="greeting-text" id="greetingText"></p>
+      <a class="greeting-suggest" id="greetingSuggest" href="#" target="_blank" rel="noreferrer" hidden></a>
+    </div>
+
+    <div class="recent-row" id="recentRow" hidden>
+      <p class="recent-label">Quick resume</p>
+      <div class="recent-chips" id="recentChips"></div>
+    </div>
+
     <section class="jump-bar" aria-label="Quick controls">
       <div class="jump-bar__top">
         <div class="search-shell">
           <label class="search-label" for="searchInput">Search routes, hubs, references, and admin surfaces</label>
           <input class="search-input" id="searchInput" type="search" placeholder="Try inbox, cooking, calendar, finance, maintenance...">
+          <div class="search-recents" id="searchRecents" hidden></div>
         </div>
         <p class="surface-count"><strong id="visibleCount">39</strong> visible surfaces</p>
       </div>
@@ -1564,6 +1725,226 @@
     }
   }, {passive: true});
   updateActiveJumpLink();
+
+  /* ── Anticipatory UX ─────────────────────────────── */
+
+  const STORE_KEY = "homeos";
+
+  function loadStore(){
+    try {
+      return JSON.parse(localStorage.getItem(STORE_KEY)) || {};
+    } catch { return {}; }
+  }
+
+  function saveStore(store){
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch {}
+  }
+
+  function getStore(){
+    const defaults = {
+      visits: {},        // { href: { count, lastTs, title, kind } }
+      searches: [],      // last 5 unique search terms
+      lastFilter: "all",
+      lastSearch: "",
+      sessionCount: 0,
+      firstSeen: 0,
+    };
+    const raw = loadStore();
+    return { ...defaults, ...raw };
+  }
+
+  /* ── Init ── */
+  const store = getStore();
+  const now = Date.now();
+  if (!store.firstSeen) store.firstSeen = now;
+  store.sessionCount = (store.sessionCount || 0) + 1;
+  saveStore(store);
+
+  /* ── 1. Time-of-day greeting with suggested action ── */
+  (function renderGreeting(){
+    const hour = new Date().getHours();
+    let greeting, suggestTitle, suggestHref;
+
+    if (hour < 6){
+      greeting = "Up early.";
+    } else if (hour < 12){
+      greeting = "Good morning.";
+      suggestTitle = "Family Inbox";
+      suggestHref = "https://www.notion.so/2b9255fc8f448017a7e0f8b72d21c1ed";
+    } else if (hour < 17){
+      greeting = "Good afternoon.";
+      suggestTitle = "Dashboard";
+      suggestHref = "https://www.notion.so/f3fe2637a59d402781e3d7ca07bfbc9c";
+    } else if (hour < 21){
+      greeting = "Good evening.";
+      suggestTitle = "Food & Cooking";
+      suggestHref = "https://www.notion.so/a946a07ce00d4855bc0186a239161dfa";
+    } else {
+      greeting = "Winding down.";
+    }
+
+    /* Override suggestion with most-visited if we have data */
+    const topVisit = Object.entries(store.visits)
+      .filter(([, v]) => v.kind !== "admin")
+      .sort((a, b) => b[1].count - a[1].count)[0];
+
+    if (topVisit && topVisit[1].count >= 3){
+      suggestTitle = topVisit[1].title;
+      suggestHref = topVisit[0];
+    }
+
+    const bar = document.getElementById("greetingBar");
+    const text = document.getElementById("greetingText");
+    const suggest = document.getElementById("greetingSuggest");
+
+    text.innerHTML = `<strong>${greeting}</strong> What do you need?`;
+    bar.hidden = false;
+
+    if (suggestTitle && suggestHref){
+      suggest.textContent = suggestTitle;
+      suggest.href = suggestHref;
+      suggest.hidden = false;
+    }
+  })();
+
+  /* ── 2. Frecency-based recent row ── */
+  function renderRecents(){
+    const row = document.getElementById("recentRow");
+    const chips = document.getElementById("recentChips");
+    const entries = Object.entries(store.visits)
+      .map(([href, v]) => ({ href, ...v }))
+      .sort((a, b) => {
+        /* Frecency: weight count heavily, recency as tiebreaker */
+        const scoreA = a.count * 10 + (a.lastTs || 0) / 1e10;
+        const scoreB = b.count * 10 + (b.lastTs || 0) / 1e10;
+        return scoreB - scoreA;
+      })
+      .slice(0, 6);
+
+    if (entries.length === 0) return;
+
+    chips.innerHTML = "";
+    entries.forEach(entry => {
+      const a = document.createElement("a");
+      a.className = "recent-chip";
+      a.href = entry.href;
+      a.target = "_blank";
+      a.rel = "noreferrer";
+      a.innerHTML = `${entry.title} <span class="rc-kind">${entry.kind}</span><span class="rc-freq">${entry.count}</span>`;
+      chips.appendChild(a);
+    });
+    row.hidden = false;
+  }
+  renderRecents();
+
+  /* ── 3. Track card clicks ── */
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      const href = card.href;
+      const title = card.querySelector(".resource-card__title, strong")?.textContent || "";
+      const kind = card.dataset.kind || "";
+      if (!store.visits[href]) store.visits[href] = { count: 0, lastTs: 0, title, kind };
+      store.visits[href].count += 1;
+      store.visits[href].lastTs = Date.now();
+      store.visits[href].title = title;
+      store.visits[href].kind = kind;
+      saveStore(store);
+    });
+  });
+
+  /* Also track mini-link (admin) clicks */
+  document.querySelectorAll(".mini-link").forEach(link => {
+    link.addEventListener("click", () => {
+      const href = link.href;
+      const title = link.querySelector("strong")?.textContent || "";
+      if (!store.visits[href]) store.visits[href] = { count: 0, lastTs: 0, title, kind: "admin" };
+      store.visits[href].count += 1;
+      store.visits[href].lastTs = Date.now();
+      saveStore(store);
+    });
+  });
+
+  /* ── 4. Search recollection ── */
+  const searchRecentsEl = document.getElementById("searchRecents");
+
+  function renderSearchRecents(){
+    if (!store.searches || store.searches.length === 0){
+      searchRecentsEl.hidden = true;
+      return;
+    }
+    searchRecentsEl.innerHTML = "";
+    store.searches.slice(0, 5).forEach(term => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "search-recent-chip";
+      chip.textContent = term;
+      chip.addEventListener("click", () => {
+        searchInput.value = term;
+        searchInput.dispatchEvent(new Event("input"));
+        searchInput.focus();
+      });
+      searchRecentsEl.appendChild(chip);
+    });
+    searchRecentsEl.hidden = false;
+  }
+  renderSearchRecents();
+
+  /* Save search terms on meaningful input (debounced) */
+  let searchSaveTimer = null;
+  searchInput.addEventListener("input", () => {
+    clearTimeout(searchSaveTimer);
+    searchSaveTimer = setTimeout(() => {
+      const val = searchInput.value.trim().toLowerCase();
+      if (val.length < 2) return;
+      if (!store.searches) store.searches = [];
+      store.searches = [val, ...store.searches.filter(s => s !== val)].slice(0, 5);
+      saveStore(store);
+      renderSearchRecents();
+    }, 800);
+  });
+
+  /* ── 5. Persist filter + search across sessions ── */
+  if (store.lastFilter && store.lastFilter !== "all"){
+    activeFilter = store.lastFilter;
+    freshFilterButtons.forEach(b => {
+      b.classList.toggle("is-active", b.dataset.filter === activeFilter);
+    });
+    syncVisibilityWithFeedback();
+  }
+
+  if (store.lastSearch){
+    searchInput.value = store.lastSearch;
+    syncVisibilityWithFeedback();
+  }
+
+  /* Save filter and search on change */
+  freshFilterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      store.lastFilter = button.dataset.filter;
+      saveStore(store);
+    });
+  });
+
+  searchInput.addEventListener("input", () => {
+    store.lastSearch = searchInput.value.trim();
+    saveStore(store);
+  });
+
+  /* ── 6. Pre-fill search placeholder with time-contextual hint ── */
+  (function contextualPlaceholder(){
+    const hour = new Date().getHours();
+    const day = new Date().getDay();
+    let hint = "Try inbox, cooking, calendar, finance, maintenance...";
+
+    if (hour >= 6 && hour < 10) hint = "Morning \u2014 try inbox, calendar, dashboard...";
+    else if (hour >= 11 && hour < 14) hint = "Midday \u2014 try cooking, shopping, meals...";
+    else if (hour >= 17 && hour < 21) hint = "Evening \u2014 try cooking, pets, photos...";
+    else if (hour >= 21 || hour < 6) hint = "Late night \u2014 try documents, finance, travel...";
+
+    if (day === 0 || day === 6) hint = hint.replace(/\u2014.*/, "\u2014 try yard, workshop, home maintenance...");
+
+    searchInput.placeholder = hint;
+  })();
 </script>
 </body>
 </html>

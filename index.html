@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#efe5d7;
+    --bg-deep:#e0cfb8;
+    --paper:#faf4ea;
+    --panel:#f6eee2;
+    --panel-strong:#ebdcc8;
+    --line:#d5bea0;
+    --line-strong:#a98052;
+    --ink:#21160d;
+    --ink-soft:#5b4736;
+    --muted:#7a6351;
+    --accent:#9c5d32;
+    --accent-deep:#77411d;
+    --moss:#667951;
+    --gold:#c99d55;
+    --danger:#a24a39;
+    --shadow-lg:0 26px 60px rgba(58,34,13,0.14);
+    --shadow-md:0 14px 28px rgba(58,34,13,0.1);
+    --radius-xl:28px;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:10px;
+    --content:1240px;
+    --speed:180ms;
+  }
+
+  *{box-sizing:border-box}
+
+  html{
+    scroll-behavior:smooth;
+  }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at top left, rgba(201,157,85,0.28), transparent 28%),
+      radial-gradient(circle at 80% 10%, rgba(156,93,50,0.12), transparent 22%),
+      linear-gradient(180deg, #f7f0e6 0%, var(--bg) 38%, #e8d9c5 100%);
+    font-family:"IBM Plex Sans", sans-serif;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      linear-gradient(rgba(91,71,54,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,71,54,0.035) 1px, transparent 1px);
+    background-size:26px 26px;
+    mask-image:linear-gradient(180deg, rgba(0,0,0,0.55), transparent 85%);
+    opacity:.35;
+  }
+
+  a{
+    color:inherit;
+    text-decoration:none;
+  }
+
+  button,
+  input{
+    font:inherit;
+  }
+
+  button{
+    cursor:pointer;
+  }
+
+  :focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+  }
+
+  .page{
+    position:relative;
+    max-width:var(--content);
+    margin:0 auto;
+    padding:28px 20px 64px;
+  }
+
+  .hero{
+    position:relative;
+    display:grid;
+    grid-template-columns:minmax(0, 1.2fr) minmax(320px, .8fr);
+    gap:24px;
+    padding:32px;
+    border:1px solid rgba(112,82,52,0.16);
+    border-radius:36px;
+    background:
+      linear-gradient(145deg, rgba(250,244,234,0.96), rgba(239,227,212,0.92));
+    box-shadow:var(--shadow-lg);
+    overflow:hidden;
+  }
+
+  .hero::before{
+    content:"HOME";
+    position:absolute;
+    right:-14px;
+    bottom:-28px;
+    font-family:"Fraunces", serif;
+    font-size:clamp(6rem, 17vw, 12rem);
+    line-height:.88;
+    letter-spacing:-0.08em;
+    color:rgba(131,91,54,0.08);
+    pointer-events:none;
+  }
+
+  .eyebrow,
+  .chip,
+  .mini-kicker,
+  .resource-card__meta,
+  .section-header p,
+  .filter-btn,
+  .surface-count,
+  .panel-label{
+    font-family:"IBM Plex Mono", monospace;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin:0 0 14px;
+    padding:8px 12px;
+    border:1px solid rgba(112,82,52,0.18);
+    border-radius:999px;
+    background:rgba(255,255,255,0.58);
+    color:var(--muted);
+    font-size:.76rem;
+  }
+
+  .hero h1,
+  .section-header h2,
+  .logic-card h3,
+  .roadmap-card h3,
+  .footer-card h3{
+    margin:0;
+    font-family:"Fraunces", serif;
+    font-weight:600;
+    letter-spacing:-0.04em;
+  }
+
+  .hero h1{
+    font-size:clamp(3.3rem, 7vw, 6.4rem);
+    line-height:.9;
+    max-width:7ch;
+  }
+
+  .hero-copy > p{
+    max-width:62ch;
+    margin:16px 0 0;
+    font-size:1.04rem;
+    line-height:1.75;
+    color:var(--ink-soft);
+  }
+
+  .hero-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:24px;
+  }
+
+  .hero-action,
+  .subtle-action{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:48px;
+    padding:0 18px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    transition:transform var(--speed), border-color var(--speed), background var(--speed);
+  }
+
+  .hero-action{
+    background:var(--accent);
+    border-color:transparent;
+    color:#fff8f0;
+    box-shadow:0 10px 20px rgba(128,72,30,0.2);
+  }
+
+  .hero-action:hover,
+  .subtle-action:hover,
+  .filter-btn:hover,
+  .resource-card:hover,
+  .jump-link:hover,
+  .footer-link:hover{
+    transform:translateY(-2px);
+  }
+
+  .hero-action:hover{
+    background:var(--accent-deep);
+  }
+
+  .subtle-action{
+    background:rgba(255,255,255,0.64);
+    color:var(--ink);
+  }
+
+  .hero-grid{
+    margin-top:26px;
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:12px;
+  }
+
+  .hero-grid article{
+    padding:16px;
+    border-radius:18px;
+    border:1px solid rgba(112,82,52,0.14);
+    background:rgba(255,252,247,0.7);
+    box-shadow:var(--shadow-md);
+  }
+
+  .hero-grid strong{
+    display:block;
+    margin-bottom:8px;
+    font-size:.95rem;
+  }
+
+  .hero-grid p{
+    margin:0;
+    color:var(--ink-soft);
+    line-height:1.6;
+    font-size:.94rem;
+  }
+
+  .hero-panel{
+    position:relative;
+    padding:22px;
+    border-radius:28px;
+    border:1px solid rgba(112,82,52,0.18);
+    background:
+      linear-gradient(180deg, rgba(41,25,14,0.92), rgba(27,18,10,0.92));
+    color:#f4eadf;
+    box-shadow:var(--shadow-md);
+  }
+
+  .hero-panel::after{
+    content:"Navigation Atlas";
+    position:absolute;
+    inset:auto 20px 18px auto;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem;
+    color:rgba(244,234,223,0.45);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  .panel-label{
+    display:inline-flex;
+    align-items:center;
+    padding:7px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.08);
+    color:#d8c5ad;
+    font-size:.74rem;
+  }
+
+  .panel-headline{
+    margin:18px 0 12px;
+    font-family:"Fraunces", serif;
+    font-size:2rem;
+    line-height:1.05;
+    letter-spacing:-0.04em;
+  }
+
+  .panel-copy{
+    margin:0;
+    line-height:1.75;
+    color:#d7c7b4;
+  }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:12px;
+    margin:20px 0 22px;
+  }
+
+  .stat{
+    padding:16px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+
+  .stat strong{
+    display:block;
+    font-family:"Fraunces", serif;
+    font-size:2rem;
+    line-height:1;
+    letter-spacing:-0.05em;
+  }
+
+  .stat span{
+    display:block;
+    margin-top:8px;
+    color:#cbb69d;
+    font-size:.88rem;
+  }
+
+  .panel-rules{
+    display:grid;
+    gap:10px;
+    margin:0;
+    padding:0;
+    list-style:none;
+  }
+
+  .panel-rules li{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    color:#d7c7b4;
+    line-height:1.55;
+  }
+
+  .panel-rules li::before{
+    content:"•";
+    color:var(--gold);
+    font-size:1.1rem;
+    line-height:1;
+  }
+
+  .jump-bar{
+    position:sticky;
+    top:16px;
+    z-index:5;
+    margin:24px 0;
+    padding:14px;
+    border-radius:22px;
+    border:1px solid rgba(112,82,52,0.12);
+    background:rgba(250,244,234,0.84);
+    backdrop-filter:blur(16px);
+    box-shadow:0 10px 24px rgba(58,34,13,0.08);
+  }
+
+  .jump-bar__top{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    gap:14px;
+    align-items:flex-start;
+  }
+
+  .search-shell{
+    display:grid;
+    gap:10px;
+    flex:1 1 360px;
+  }
+
+  .search-label{
+    color:var(--muted);
+    font-size:.8rem;
+  }
+
+  .search-input{
+    width:100%;
+    min-height:48px;
+    padding:0 16px;
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.75);
+    color:var(--ink);
+  }
+
+  .filter-row,
+  .jump-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  .filter-btn,
+  .jump-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:38px;
+    padding:0 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.72);
+    color:var(--ink-soft);
+    transition:transform var(--speed), background var(--speed), border-color var(--speed), color var(--speed);
+  }
+
+  .filter-btn.is-active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:#f4eadf;
+  }
+
+  .surface-count{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:0;
+    color:var(--muted);
+    font-size:.78rem;
+  }
+
+  .surface-count strong{
+    color:var(--ink);
+    font-size:.95rem;
+  }
+
+  main{
+    display:grid;
+    gap:24px;
+  }
+
+  .section{
+    position:relative;
+    padding:26px;
+    border-radius:30px;
+    background:rgba(250,244,234,0.9);
+    border:1px solid rgba(112,82,52,0.12);
+    box-shadow:var(--shadow-md);
+  }
+
+  .section-header{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    gap:18px;
+    align-items:flex-end;
+    margin-bottom:20px;
+  }
+
+  .section-header h2{
+    font-size:clamp(2rem, 3vw, 3rem);
+    line-height:.95;
+  }
+
+  .section-header p{
+    max-width:42ch;
+    margin:0;
+    color:var(--muted);
+    font-size:.8rem;
+    line-height:1.6;
+  }
+
+  .resource-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:14px;
+  }
+
+  .resource-card{
+    display:grid;
+    gap:14px;
+    padding:18px;
+    border-radius:22px;
+    border:1px solid rgba(112,82,52,0.12);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.88), rgba(245,236,223,0.82));
+    box-shadow:0 10px 22px rgba(58,34,13,0.08);
+    transition:transform var(--speed), border-color var(--speed), box-shadow var(--speed);
+  }
+
+  .resource-card[hidden],
+  .resource-section[hidden]{
+    display:none !important;
+  }
+
+  .resource-card:hover{
+    border-color:rgba(112,82,52,0.28);
+    box-shadow:0 16px 28px rgba(58,34,13,0.12);
+  }
+
+  .resource-card__top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:flex-start;
+  }
+
+  .resource-card__meta{
+    color:var(--muted);
+    font-size:.72rem;
+  }
+
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    min-height:28px;
+    padding:0 10px;
+    border-radius:999px;
+    background:rgba(102,121,81,0.11);
+    color:var(--moss);
+    font-size:.72rem;
+  }
+
+  .resource-card__title{
+    margin:0;
+    font-family:"Fraunces", serif;
+    font-size:1.45rem;
+    line-height:1.02;
+    letter-spacing:-0.03em;
+  }
+
+  .resource-card__body{
+    margin:0;
+    color:var(--ink-soft);
+    line-height:1.65;
+    font-size:.96rem;
+  }
+
+  .resource-card__cta{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:var(--accent);
+    font-weight:600;
+  }
+
+  .resource-card__cta::after{
+    content:"↗";
+    font-size:1rem;
+  }
+
+  .ownership-grid,
+  .logic-grid,
+  .roadmap-grid,
+  .footer-grid{
+    display:grid;
+    gap:16px;
+  }
+
+  .ownership-grid{
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+    margin-bottom:20px;
+  }
+
+  .ownership-card{
+    padding:18px;
+    border-radius:22px;
+    border:1px solid rgba(112,82,52,0.12);
+    background:rgba(255,255,255,0.66);
+  }
+
+  .ownership-card strong{
+    display:block;
+    margin-bottom:8px;
+    font-size:1rem;
+  }
+
+  .ownership-card p{
+    margin:0;
+    color:var(--ink-soft);
+    line-height:1.6;
+  }
+
+  .logic-grid{
+    grid-template-columns:1.2fr .8fr;
+    margin-bottom:18px;
+  }
+
+  .logic-card,
+  .roadmap-card,
+  .footer-card{
+    padding:20px;
+    border-radius:24px;
+    border:1px solid rgba(112,82,52,0.12);
+    background:rgba(255,255,255,0.58);
+  }
+
+  .logic-card h3,
+  .roadmap-card h3,
+  .footer-card h3{
+    font-size:1.7rem;
+    line-height:1;
+    margin-bottom:16px;
+  }
+
+  .ops-table{
+    display:grid;
+    gap:12px;
+  }
+
+  .ops-row{
+    display:grid;
+    grid-template-columns:minmax(160px, .4fr) minmax(0, 1fr);
+    gap:14px;
+    padding:14px;
+    border-radius:18px;
+    background:rgba(246,238,226,0.92);
+    border:1px solid rgba(112,82,52,0.1);
+  }
+
+  .ops-row strong{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+  }
+
+  .ops-row span{
+    color:var(--ink-soft);
+    line-height:1.65;
+  }
+
+  .mini-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:12px;
+  }
+
+  .mini-link{
+    display:grid;
+    gap:8px;
+    padding:16px;
+    border-radius:18px;
+    border:1px solid rgba(112,82,52,0.12);
+    background:rgba(245,236,223,0.88);
+  }
+
+  .mini-link strong{
+    font-size:1rem;
+  }
+
+  .mini-link span{
+    color:var(--muted);
+    font-size:.88rem;
+    line-height:1.5;
+  }
+
+  .accordion-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:14px;
+  }
+
+  details{
+    border-radius:20px;
+    border:1px solid rgba(112,82,52,0.12);
+    background:rgba(255,255,255,0.62);
+    overflow:hidden;
+  }
+
+  summary{
+    list-style:none;
+    padding:18px 18px 16px;
+    cursor:pointer;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+
+  summary::-webkit-details-marker{
+    display:none;
+  }
+
+  summary::after{
+    content:"+";
+    font-family:"IBM Plex Mono", monospace;
+    color:var(--muted);
+  }
+
+  details[open] summary::after{
+    content:"−";
+  }
+
+  .detail-body{
+    padding:0 18px 18px;
+    color:var(--ink-soft);
+  }
+
+  .detail-body ul,
+  .detail-body ol{
+    margin:0;
+    padding-left:18px;
+    display:grid;
+    gap:8px;
+  }
+
+  .roadmap-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .priority-list,
+  .theme-list{
+    display:grid;
+    gap:10px;
+    margin:0;
+    padding:0;
+    list-style:none;
+  }
+
+  .priority-list li,
+  .theme-list li{
+    padding:14px 16px;
+    border-radius:18px;
+    background:rgba(245,236,223,0.88);
+    border:1px solid rgba(112,82,52,0.12);
+    line-height:1.65;
+    color:var(--ink-soft);
+  }
+
+  .priority-list strong,
+  .theme-list strong{
+    color:var(--ink);
+  }
+
+  .footer-grid{
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+  }
+
+  .footer-link{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+    padding:14px 0 0;
+    color:var(--accent);
+    font-weight:600;
+  }
+
+  .footer-link::after{
+    content:"↗";
+  }
+
+  .empty-state{
+    margin-top:16px;
+    padding:18px;
+    border-radius:18px;
+    border:1px dashed rgba(112,82,52,0.24);
+    color:var(--muted);
+    background:rgba(255,255,255,0.46);
+  }
+
+  .site-footer{
+    margin-top:18px;
+    text-align:center;
+    color:var(--muted);
+    font-size:.9rem;
+  }
+
+  @media (max-width: 1080px){
+    .hero,
+    .logic-grid,
+    .roadmap-grid{
+      grid-template-columns:1fr;
+    }
+
+    .ownership-grid,
+    .accordion-grid,
+    .footer-grid{
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 760px){
+    .page{
+      padding:14px 14px 42px;
+    }
+
+    .hero,
+    .section{
+      padding:20px;
+      border-radius:24px;
+    }
+
+    .hero-grid,
+    .ownership-grid,
+    .accordion-grid,
+    .footer-grid,
+    .mini-grid,
+    .stat-grid{
+      grid-template-columns:1fr;
+    }
+
+    .ops-row{
+      grid-template-columns:1fr;
+    }
+
+    .jump-bar{
+      top:8px;
+    }
+
+    .filter-row,
+    .jump-links,
+    .hero-actions{
+      gap:8px;
+    }
+
+    .filter-btn,
+    .jump-link,
+    .hero-action,
+    .subtle-action{
+      width:100%;
+    }
+
+    .resource-grid{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{
+      scroll-behavior:auto;
+    }
+
+    *,
+    *::before,
+    *::after{
+      transition:none !important;
+      animation:none !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow">Family-safe navigation facade for the Robertson household</p>
+        <h1>Home OS</h1>
+        <p><strong>Family-safe navigation facade that routes to canonical systems without duplicating them.</strong> This is the front door, not the machine room: a household atlas that points the family to the right destination, keeps fragile systems protected, and makes everyday access feel obvious instead of technical.</p>
+        <div class="hero-actions">
+          <a class="hero-action" href="https://www.notion.so/2b4255fc8f4480e4b10ac21f73ee249b" target="_blank" rel="noreferrer">Open Start</a>
+          <a class="subtle-action" href="https://www.notion.so/2b9255fc8f448017a7e0f8b72d21c1ed" target="_blank" rel="noreferrer">Capture to Inbox</a>
+          <a class="subtle-action" href="https://www.notion.so/f3fe2637a59d402781e3d7ca07bfbc9c" target="_blank" rel="noreferrer">See Dashboard</a>
+        </div>
+        <div class="hero-grid" aria-label="Ownership overview">
+          <article>
+            <strong>Home OS owns</strong>
+            <p>Access, presentation, and family-safe wayfinding.</p>
+          </article>
+          <article>
+            <strong>05 | Home &amp; Family owns</strong>
+            <p>Deep operations, project detail, and active coordination.</p>
+          </article>
+          <article>
+            <strong>Databases own</strong>
+            <p>The truth, the records, and the canonical source material.</p>
+          </article>
+          <article>
+            <strong>REF pages own</strong>
+            <p>Pointer behavior, not content duplication.</p>
+          </article>
+        </div>
+      </div>
+
+      <aside class="hero-panel" aria-label="Household summary">
+        <span class="panel-label">Operating snapshot</span>
+        <p class="panel-headline">A front door with guardrails.</p>
+        <p class="panel-copy">Home OS is the family-facing navigation layer. It should feel calm, obvious, and safe even while the real systems behind it stay precise, segmented, and canonical.</p>
+        <div class="stat-grid">
+          <div class="stat">
+            <strong id="routeCount">6</strong>
+            <span>Primary routes</span>
+          </div>
+          <div class="stat">
+            <strong id="hubCount">16</strong>
+            <span>Family hubs</span>
+          </div>
+          <div class="stat">
+            <strong id="refCount">11</strong>
+            <span>Reference pages</span>
+          </div>
+          <div class="stat">
+            <strong id="adminCount">6</strong>
+            <span>Admin surfaces</span>
+          </div>
+        </div>
+        <ul class="panel-rules">
+          <li>Point to canonical systems instead of rebuilding them.</li>
+          <li>Keep family-facing surfaces easy to browse and hard to break.</li>
+          <li>Use badges, naming, and routing to make ownership obvious.</li>
+        </ul>
+      </aside>
+    </header>
+
+    <section class="jump-bar" aria-label="Quick controls">
+      <div class="jump-bar__top">
+        <div class="search-shell">
+          <label class="search-label" for="searchInput">Search routes, hubs, references, and admin surfaces</label>
+          <input class="search-input" id="searchInput" type="search" placeholder="Try inbox, cooking, calendar, finance, maintenance...">
+        </div>
+        <p class="surface-count"><strong id="visibleCount">39</strong> visible surfaces</p>
+      </div>
+      <div class="filter-row" aria-label="Surface filters">
+        <button class="filter-btn is-active" type="button" data-filter="all">All</button>
+        <button class="filter-btn" type="button" data-filter="route">Routes</button>
+        <button class="filter-btn" type="button" data-filter="hub">Hubs</button>
+        <button class="filter-btn" type="button" data-filter="reference">Refs</button>
+        <button class="filter-btn" type="button" data-filter="admin">Admin</button>
+      </div>
+      <nav class="jump-links" aria-label="Section jumps">
+        <a class="jump-link" href="#routes">Front door</a>
+        <a class="jump-link" href="#hubs">Family hubs</a>
+        <a class="jump-link" href="#references">Reference index</a>
+        <a class="jump-link" href="#operating-model">Operating model</a>
+        <a class="jump-link" href="#roadmap">Roadmap</a>
+      </nav>
+    </section>
+
+    <main>
+      <section class="section resource-section" id="routes">
+        <div class="section-header">
+          <div>
+            <p>Primary navigation</p>
+            <h2>The front door.</h2>
+          </div>
+          <p>These are the everyday entry points: the places a family member should hit first before dropping into deeper systems.</p>
+        </div>
+        <div class="resource-grid" id="routesGrid"></div>
+      </section>
+
+      <section class="section resource-section" id="hubs">
+        <div class="section-header">
+          <div>
+            <p>Available hubs</p>
+            <h2>The household atlas.</h2>
+          </div>
+          <p>All family hubs are tracked in <strong>DB | 103 | Fam Hubs</strong>. This layer should help people find the right domain without learning the back-end structure.</p>
+        </div>
+        <div class="resource-grid" id="hubsGrid"></div>
+      </section>
+
+      <section class="section resource-section" id="references">
+        <div class="section-header">
+          <div>
+            <p>REF index pages</p>
+            <h2>Pointers, not duplicates.</h2>
+          </div>
+          <p>These reference pages should behave like clean indexes into canonical systems. They should stay light, browseable, and clearly marked.</p>
+        </div>
+        <div class="resource-grid" id="referencesGrid"></div>
+      </section>
+
+      <section class="section resource-section" id="operating-model">
+        <div class="section-header">
+          <div>
+            <p>How this works</p>
+            <h2>Operating model and ownership.</h2>
+          </div>
+          <p>Home OS works only if ownership stays explicit. This section keeps the routing logic, admin links, and canonical boundaries visible.</p>
+        </div>
+
+        <div class="ownership-grid">
+          <article class="ownership-card">
+            <strong>Home OS</strong>
+            <p>Front door, family-safe navigation, visibility and access checklist, cross-family map.</p>
+          </article>
+          <article class="ownership-card">
+            <strong>05 | Home &amp; Family</strong>
+            <p>Active home ops hub, deeper project context, workshop, reno, and vehicle coordination.</p>
+          </article>
+          <article class="ownership-card">
+            <strong>Databases</strong>
+            <p>Systems of record for tasks, projects, documents, recipes, travel, budgets, and maintenance.</p>
+          </article>
+          <article class="ownership-card">
+            <strong>REF pages</strong>
+            <p>Canonical pointers that make browsing easier without duplicating truth.</p>
+          </article>
+        </div>
+
+        <div class="logic-grid">
+          <article class="logic-card">
+            <h3>Layer map</h3>
+            <div class="ops-table">
+              <div class="ops-row">
+                <strong>Home OS</strong>
+                <span>Front door, family-safe navigation, visibility and access checklist, and the cross-family map.</span>
+              </div>
+              <div class="ops-row">
+                <strong>05 | Home &amp; Family</strong>
+                <span>Active home operations hub with deeper project context, workshop, reno, vehicle, and maintenance coordination.</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="logic-card resource-section" id="admin">
+            <h3>System admin</h3>
+            <div class="mini-grid" id="adminGrid"></div>
+          </article>
+        </div>
+
+        <div class="accordion-grid">
+          <details open>
+            <summary>What's canonical in Home OS</summary>
+            <div class="detail-body">
+              <ul>
+                <li>HOME | Start</li>
+                <li>HOME | Dashboard</li>
+                <li>DASH | Mom Home</li>
+                <li>INBX | Family Inbox</li>
+                <li>HUB | Family Hubs</li>
+                <li>SYS | Map</li>
+                <li>Family-safe REF pointer pages</li>
+                <li>Mom-facing hobby pages meant for easy browsing</li>
+              </ul>
+            </div>
+          </details>
+
+          <details>
+            <summary>What's canonical outside Home OS</summary>
+            <div class="detail-body">
+              <ul>
+                <li>Workshop and Reno</li>
+                <li>Garden operations</li>
+                <li>Vehicles and maintenance</li>
+                <li>Smart home and Home Assistant</li>
+                <li>Broader house infrastructure projects</li>
+                <li>Deep operational project hubs</li>
+              </ul>
+            </div>
+          </details>
+
+          <details>
+            <summary>Systems of record to never duplicate</summary>
+            <div class="detail-body">
+              <ul>
+                <li>DB | Tasks (Robertson)</li>
+                <li>DB | Projects (Robertsons)</li>
+                <li>DB | Home Maintenance</li>
+                <li>DB | Documents</li>
+                <li>DB | Family Profiles</li>
+                <li>DB | Gift Ideas &amp; Wishlists</li>
+                <li>DB | Meal Planning</li>
+                <li>DB | Recipes</li>
+                <li>DB | Family Travel</li>
+                <li>DB | Budget &amp; Shared Expenses</li>
+                <li>DB | Photo Albums</li>
+                <li>DB | Garden Materials Price Tracker</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="section" id="roadmap">
+        <div class="section-header">
+          <div>
+            <p>Next steps and priorities</p>
+            <h2>Build the surface, not the duplicates.</h2>
+          </div>
+          <p>The next move is to make Home OS feel simpler than the architecture behind it. These priorities keep the interface useful while the real systems stay canonical.</p>
+        </div>
+
+        <div class="roadmap-grid">
+          <article class="roadmap-card">
+            <h3>Immediate next steps</h3>
+            <ol class="priority-list">
+              <li><strong>Rename pages</strong> to match canonical naming conventions.</li>
+              <li><strong>Assign owners</strong> for each overlapping domain.</li>
+              <li><strong>Convert placeholders</strong> into clear pointers.</li>
+              <li><strong>Move only the truly misplaced pages</strong> instead of reshuffling everything.</li>
+              <li><strong>Mark legacy duplicates</strong> once link replacement is complete.</li>
+            </ol>
+          </article>
+
+          <article class="roadmap-card">
+            <h3>Top feature priorities</h3>
+            <ul class="theme-list">
+              <li><strong>Guided Start</strong> with a three-button front door: Today, Add Something, Find Something.</li>
+              <li><strong>One-tap Family Inbox capture</strong> with pre-labeled task, question, reminder, and idea routes.</li>
+              <li><strong>Hub cards dashboard</strong> with icon, description, and click-through clarity.</li>
+              <li><strong>Inbox triage board</strong> using New, Needs Decision, Routed, and Done.</li>
+              <li><strong>Canonical badges</strong> that visibly mark pointer pages vs. systems of record.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="roadmap-grid" style="margin-top:16px;">
+          <article class="roadmap-card">
+            <h3>Feature themes</h3>
+            <ul class="theme-list">
+              <li><strong>Navigation and wayfinding</strong> through guided start, hub cards, and route clarity.</li>
+              <li><strong>Capture and triage</strong> through Family Inbox, triage board, and review queues.</li>
+              <li><strong>Roles and guardrails</strong> through family mode surfaces, safe edit zones, and admin separation.</li>
+              <li><strong>Family operations</strong> through Today views, meals entry, and house quick links.</li>
+              <li><strong>Maintainability</strong> through link checks, canonical badges, and hub registry hygiene.</li>
+            </ul>
+          </article>
+
+          <article class="roadmap-card">
+            <h3>Related resources</h3>
+            <div class="footer-grid">
+              <article class="footer-card">
+                <h3>Family Inbox</h3>
+                <p>A direct capture surface for routing household work and loose input without turning the front door into a task board.</p>
+                <a class="footer-link" href="https://www.notion.so/2b9255fc8f448017a7e0f8b72d21c1ed" target="_blank" rel="noreferrer">Open resource</a>
+              </article>
+              <article class="footer-card">
+                <h3>Info | Admin</h3>
+                <p>Administrative context for system stewards, maintenance patterns, and deeper ownership logic.</p>
+                <a class="footer-link" href="https://www.notion.so/fe2566c78a384c398a1f5206efaa89fa" target="_blank" rel="noreferrer">Open resource</a>
+              </article>
+              <article class="footer-card">
+                <h3>DB | 103 | Fam Hubs</h3>
+                <p>The registry of family hubs that Home OS should point to instead of attempting to recreate.</p>
+                <a class="footer-link" href="https://www.notion.so/4db2a66cbdf94432beff561bf96e90a6" target="_blank" rel="noreferrer">Open resource</a>
+              </article>
+            </div>
+          </article>
+        </div>
+
+        <div class="empty-state" id="emptyState" hidden>No surfaces match the current search and filter state. Clear the search or switch back to <strong>All</strong>.</div>
+      </section>
+    </main>
+
+    <p class="site-footer">Home OS should stay clear, calm, and pointer-first. The family sees the map. The systems keep the truth.</p>
+  </div>
+
+<script>
+  const primaryRoutes = [
+    {
+      title: "HOME | Start",
+      href: "https://www.notion.so/2b4255fc8f4480e4b10ac21f73ee249b",
+      description: "The household front door for low-friction navigation and quick family-safe entry.",
+      meta: "Primary Route",
+      kind: "route"
+    },
+    {
+      title: "Dashboard",
+      href: "https://www.notion.so/f3fe2637a59d402781e3d7ca07bfbc9c",
+      description: "Shared overview for the most important family surfaces and current visibility.",
+      meta: "Primary Route",
+      kind: "route"
+    },
+    {
+      title: "Mom Home",
+      href: "https://www.notion.so/2b7255fc8f4480e7b63cf32870a0ef57",
+      description: "A calmer, easier browsing surface for mom-facing routines and favorite paths.",
+      meta: "Primary Route",
+      kind: "route"
+    },
+    {
+      title: "INBX | Family Inbox",
+      href: "https://www.notion.so/2b9255fc8f448017a7e0f8b72d21c1ed",
+      description: "Capture tasks, reminders, questions, and loose household input before routing them deeper.",
+      meta: "Primary Route",
+      kind: "route"
+    },
+    {
+      title: "PRJ | Family Projects",
+      href: "https://www.notion.so/31a255fc8f448072aa03cd7817fe881f",
+      description: "Active work surface for shared initiatives that still belong in canonical project systems.",
+      meta: "Primary Route",
+      kind: "route"
+    },
+    {
+      title: "HUB | Food & Cooking",
+      href: "https://www.notion.so/a946a07ce00d4855bc0186a239161dfa",
+      description: "The kitchen-facing path into meals, planning, recipes, and everyday household cooking.",
+      meta: "Primary Route",
+      kind: "route"
+    }
+  ];
+
+  const hubs = [
+    ["Calendar", "https://www.notion.so/2b4255fc8f448070a2bfd486744e6efb"],
+    ["Contacts", "https://www.notion.so/d994ced6ded04882a65528ba46b5a3be"],
+    ["Documents", "https://www.notion.so/605464e0e0cf41e6b08cd376f63eb893"],
+    ["Family Profiles", "https://www.notion.so/2a48553ee96d431c8b47bb571adea3fe"],
+    ["Finance", "https://www.notion.so/2b7255fc8f4480c3beb5e453cba1beef"],
+    ["Gift Ideas", "https://www.notion.so/da00ab0ddb3a4c5c8241c974d292407d"],
+    ["Health", "https://www.notion.so/c742b8703b0944d7b1ccb6454c4295dc"],
+    ["Home Maintenance", "https://www.notion.so/0753bfea7cd14672979af87a90bd05bb"],
+    ["Learning", "https://www.notion.so/2b7255fc8f44807da7fbc06ab5c8fa9c"],
+    ["Pets", "https://www.notion.so/2b7255fc8f4480ffa259e1a80aac1bcb"],
+    ["Photos", "https://www.notion.so/2b7255fc8f448044b6edc49031aeb1e6"],
+    ["Shopping", "https://www.notion.so/c4e631223c274024b1ddd37f4ec89951"],
+    ["Travel", "https://www.notion.so/bc1b01b2585e4de2b694022f01ce7922"],
+    ["Vehicles", "https://www.notion.so/c22c820c992d44a8814bb6706d6c0206"],
+    ["Workshop", "https://www.notion.so/0fc44996ec39409c84706cf0497b0fef"],
+    ["Yard", "https://www.notion.so/248255fc8f44806ca733f8b53d6166a9"]
+  ].map(([title, href]) => ({
+    title,
+    href,
+    description: "Family hub for this domain, surfaced here as a pointer into the right operational context.",
+    meta: "Family Hub",
+    kind: "hub"
+  }));
+
+  const references = [
+    ["Apps", "https://www.notion.so/2ee6b5b53ae94607bc98a44473a2c575"],
+    ["Books", "https://www.notion.so/6ba312c1ac08415aa0516016617aa985"],
+    ["Courses", "https://www.notion.so/d836d169d83e431ba2a2a5d1501f6efa"],
+    ["Equipment", "https://www.notion.so/4b63f40eeb7f4284814452dd4f5e07fe"],
+    ["Events", "https://www.notion.so/75d995fb2d454f368efc92feaa9d3978"],
+    ["Games", "https://www.notion.so/a2d57e4b4f6946919f8e6086d74ea35a"],
+    ["Media", "https://www.notion.so/452f1eac5516499bb0fdf0647c99422d"],
+    ["People", "https://www.notion.so/2c167195455b486b856be38adbfae7ce"],
+    ["Places", "https://www.notion.so/d5214308ccc64688819a1db54c60b6c6"],
+    ["Products", "https://www.notion.so/9056b7764fd742b4a8cd47a58ae2c016"],
+    ["Services", "https://www.notion.so/2b8255fc8f4480e0993cd6c64ff23db7"]
+  ].map(([title, href]) => ({
+    title,
+    href,
+    description: "Reference index page that should point cleanly to canonical systems without becoming the system itself.",
+    meta: "REF Page",
+    kind: "reference"
+  }));
+
+  const adminLinks = [
+    ["Systems", "https://www.notion.so/2af255fc8f44803e8647f05ce501e776"],
+    ["Templates", "https://www.notion.so/2c8b98fb399b4822b0a2bc9cd67f72f4"],
+    ["Config", "https://www.notion.so/2ed255fc8f44807495c7ff2625736002"],
+    ["Maintenance", "https://www.notion.so/31a255fc8f4480b7aec0ee6d7efce10b"],
+    ["INFO | Admin", "https://www.notion.so/fe2566c78a384c398a1f5206efaa89fa"],
+    ["ARC | Archive", "https://www.notion.so/31a255fc8f4480669236ef73acea0811"]
+  ].map(([title, href]) => ({
+    title,
+    href,
+    description: "Admin-facing system surface for stewards and maintenance workflows.",
+    meta: "Admin",
+    kind: "admin"
+  }));
+
+  const grids = {
+    routesGrid: primaryRoutes,
+    hubsGrid: hubs,
+    referencesGrid: references
+  };
+
+  function createCard(item){
+    const card = document.createElement("a");
+    card.className = "resource-card";
+    card.href = item.href;
+    card.target = "_blank";
+    card.rel = "noreferrer";
+    card.dataset.kind = item.kind;
+    card.dataset.search = `${item.title} ${item.description} ${item.meta}`.toLowerCase();
+    card.innerHTML = `
+      <div class="resource-card__top">
+        <span class="resource-card__meta">${item.meta}</span>
+        <span class="chip">${item.kind}</span>
+      </div>
+      <h3 class="resource-card__title">${item.title}</h3>
+      <p class="resource-card__body">${item.description}</p>
+      <span class="resource-card__cta">Open in Notion</span>
+    `;
+    return card;
+  }
+
+  function createMiniLink(item){
+    const card = document.createElement("a");
+    card.className = "mini-link resource-card";
+    card.href = item.href;
+    card.target = "_blank";
+    card.rel = "noreferrer";
+    card.dataset.kind = item.kind;
+    card.dataset.search = `${item.title} ${item.description} ${item.meta}`.toLowerCase();
+    card.innerHTML = `
+      <span class="mini-kicker">${item.meta}</span>
+      <strong>${item.title}</strong>
+      <span>${item.description}</span>
+    `;
+    return card;
+  }
+
+  Object.entries(grids).forEach(([id, items]) => {
+    const container = document.getElementById(id);
+    items.forEach(item => container.appendChild(createCard(item)));
+  });
+
+  const adminGrid = document.getElementById("adminGrid");
+  adminLinks.forEach(item => adminGrid.appendChild(createMiniLink(item)));
+
+  document.getElementById("routeCount").textContent = primaryRoutes.length;
+  document.getElementById("hubCount").textContent = hubs.length;
+  document.getElementById("refCount").textContent = references.length;
+  document.getElementById("adminCount").textContent = adminLinks.length;
+
+  const searchInput = document.getElementById("searchInput");
+  const filterButtons = Array.from(document.querySelectorAll(".filter-btn"));
+  const cards = Array.from(document.querySelectorAll(".resource-card"));
+  const sections = Array.from(document.querySelectorAll(".resource-section"));
+  const visibleCount = document.getElementById("visibleCount");
+  const emptyState = document.getElementById("emptyState");
+  let activeFilter = "all";
+
+  function syncVisibility(){
+    const query = searchInput.value.trim().toLowerCase();
+    let visible = 0;
+
+    cards.forEach(card => {
+      const kindMatch = activeFilter === "all" || card.dataset.kind === activeFilter;
+      const searchMatch = !query || card.dataset.search.includes(query);
+      const show = kindMatch && searchMatch;
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+
+    sections.forEach(section => {
+      const hasVisibleCards = section.querySelector(".resource-card:not([hidden])");
+      if (section.id === "operating-model"){
+        section.hidden = false;
+        return;
+      }
+      section.hidden = !hasVisibleCards && (activeFilter !== "all" || query);
+    });
+
+    visibleCount.textContent = visible;
+    emptyState.hidden = visible !== 0;
+  }
+
+  filterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      activeFilter = button.dataset.filter;
+      filterButtons.forEach(candidate => candidate.classList.toggle("is-active", candidate === button));
+      syncVisibility();
+    });
+  });
+
+  searchInput.addEventListener("input", syncVisibility);
+  syncVisibility();
+</script>
+</body>
+</html>

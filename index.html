@@ -1737,7 +1737,13 @@
   }
 
   function saveStore(store){
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch {}
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(store));
+    } catch (err) {
+      try {
+        window.dispatchEvent(new CustomEvent("homeos:storage-error", { detail: { err: String(err) } }));
+      } catch {}
+    }
   }
 
   function getStore(){
